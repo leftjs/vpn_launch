@@ -1,0 +1,17 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+auto lo
+iface lo inet loopback
+
+auto eno1
+iface eno1 inet static
+pre-up ifconfig eno1 hw ether 8c:dc:d4:7d:e2:23
+#b8:27:eb:0b:27:f1
+address %s
+netmask 255.255.254.0
+
+auto wlo1
+iface wlo1 inet dhcp
+wpa-ssid "test-wifi"
+wpa-psk "209209209"
+
+pre-up iptables-restore < /etc/iptables-rules

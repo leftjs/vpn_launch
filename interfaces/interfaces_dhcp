@@ -1,0 +1,12 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+auto lo
+iface lo inet loopback
+
+
+auto eth1
+iface eno1 inet dhcp
+
+auto wlan1
+iface wlo1 inet dhcp
+wpa-ssid "20-508"
+wpa-psk "508508508"
