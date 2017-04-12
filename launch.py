@@ -46,7 +46,7 @@ def add_route_item():
     commands.getstatusoutput('ip route add 202.193.0.0/16 via 10.20.39.254 dev eno1')
     commands.getstatusoutput('ip route add 10.100.123.0/24 via 10.20.39.254 dev eno1')
     commands.getstatusoutput('ip route add 10.20.0.0/16 via 10.20.39.254 dev eno1')
-    commands.getstatusoutput('ip route add 172.16.24.249/32 via 10.20.39.254 dev eno1')
+    commands.getstatusoutput('ip route add 172.16.0.0/16 via 10.20.39.254 dev eno1')
 
 
 if __name__ == '__main__':
