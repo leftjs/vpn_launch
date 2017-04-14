@@ -10,10 +10,10 @@ def get_local_ip(ifname):
 
 def check_ping():
     (ping_state, res) = commands.getstatusoutput('ping 202.193.75.254 -c 2')
-    (ping_state_baidu, res_baidu) = commands.getstatusoutput('ping www.baidu.com -c 2')
+    # (ping_state_baidu, res_baidu) = commands.getstatusoutput('ping www.baidu.com -c 2')
     # ping_state == 0 when ping is ok
-    return True if ping_state == 0 and ping_state_baidu == 0 else False
-    # return True if ping_state == 0 else False
+    # return True if ping_state == 0 and ping_state_baidu == 0 else False
+    return True if ping_state == 0 else False
 
 def read_file_content(file_name):
     the_file = open(file_name, 'r')
