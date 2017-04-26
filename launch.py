@@ -1,12 +1,44 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import socket, fcntl, struct
 import commands
 import time
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 
+# 第三方 SMTP 服务
+mail_host="smtp.qq.com"  #设置服务器
+mail_user="leftjs@foxmail.com"    #用户名
+mail_pass="xxxx"   #授权口令
+sender = 'leftjs@foxmail.com'
+receivers = ['lefttjs@gmail.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+
+
+
+def send_email(text):
+    message = MIMEText('%s' % text, 'plain', 'utf-8')
+    message['From'] = Header("leftjs", 'utf-8')
+    message['To'] =  Header("jason zhang", 'utf-8')
+    subject = 'vpn 报告'
+    message['Subject'] = Header(subject, 'utf-8')
+    try:
+        smtpObj = smtplib.SMTP_SSL()
+        smtpObj.connect(mail_host, 465)    # 25 为 SMTP 端口号
+        smtpObj.login(mail_user,mail_pass)
+        smtpObj.sendmail(sender, receivers, message.as_string())
+        print "邮件发送成功"
+    except smtplib.SMTPException:
+        print "Error: 无法发送邮件"
 
 def get_local_ip(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
-    return socket.inet_ntoa(inet[20:24])
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
+        return socket.inet_ntoa(inet[20:24])
+    except Exception, e:
+        send_email(str(e))
+        return
 
 def check_ping():
     (ping_state, res) = commands.getstatusoutput('ping 202.193.75.254 -c 2')
@@ -43,10 +75,10 @@ def restart_dnsmasq(intranet_ip):
     commands.getstatusoutput('service dnsmasq restart')
 
 def add_route_item():
-    commands.getstatusoutput('ip route add 202.193.0.0/16 via 10.20.39.254 dev eno1')
-    commands.getstatusoutput('ip route add 10.100.123.0/24 via 10.20.39.254 dev eno1')
-    commands.getstatusoutput('ip route add 10.20.0.0/16 via 10.20.39.254 dev eno1')
-    commands.getstatusoutput('ip route add 172.16.0.0/16 via 10.20.39.254 dev eno1')
+    commands.getstatusoutput('ip route add 202.193.0.0/16 via 10.20.40.254 dev eno1')
+    commands.getstatusoutput('ip route add 10.100.123.0/24 via 10.20.40.254 dev eno1')
+    commands.getstatusoutput('ip route add 10.20.0.0/16 via 10.20.40.254 dev eno1')
+    commands.getstatusoutput('ip route add 172.16.0.0/16 via 10.20.40.254 dev eno1')
 
 
 if __name__ == '__main__':
@@ -59,8 +91,11 @@ if __name__ == '__main__':
             commands.getstatusoutput('dhclient eno1')
             # get new intranet ip
             intranet_ip = get_local_ip("eno1")
+            if intranet_ip is None:
+                continue
             if old_ip == None or old_ip != intranet_ip:
                 print 'new ip: ',intranet_ip
+                send_email('新的ip为: %s' % intranet_ip)
                 create_interfaces_static_file(intranet_ip)
                 restart_pptpd(intranet_ip)
                 # restart_dnsmasq(intranet_ip)
